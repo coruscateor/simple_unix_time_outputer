@@ -16,11 +16,13 @@ fn main() {
 
     //The static mut vaiable contains a weak reference to the below reference counted StateContainers instance
 
-    let _sc = StateContainers::new();
+    //let _sc = StateContainers::new();
+
+    StateContainers::init();    
 
     //let teas = 
     
-    ApplicattionState::new(app.clone());
+    ApplicattionState::new(&app);
 
     //sc.get_adw_state_ref().get_applications_mut().add_refcell(&teas); //.insert(app.clone(), teas); //.add(&TextEdApplicattionState::new(app.clone())); //&std::rc::Rc<RefCell<(dyn gtk_estate::HasObject<gtk_estate::gtk4::Application>)>>) //&dyn Any)); //.downcast_ref().unwrap() // as &Rc<RefCell<dyn HasObject<Application>>>);
 
