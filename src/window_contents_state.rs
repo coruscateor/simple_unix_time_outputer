@@ -3,12 +3,14 @@ use std::cell::RefCell;
 use std::rc::{Weak, Rc};
 use std::time::Duration;
 
-use corlib::events::SenderEventFunc;
-use corlib::rc_default::RcDefault;
-use gtk_estate::gtk4::traits::{BoxExt, WidgetExt};
-use gtk_estate::{HasObject, impl_has_box, impl_has_object, StateContainers}; //get_state_containers, 
+use gtk_estate::{gtk4 as gtk, StateContainers};
 
-use gtk_estate::gtk4::{self as gtk, Box, Orientation, Label, BaselinePosition, Align};
+use gtk_estate::corlib::events::SenderEventFunc;
+use gtk_estate::corlib::rc_default::RcDefault;
+use gtk_estate::gtk4::prelude::{BoxExt, WidgetExt};
+//use gtk_estate::{HasObject, impl_has_box, impl_has_object, StateContainers}; //get_state_containers, 
+
+use gtk_estate::gtk4::{Box, Orientation, Label, BaselinePosition, Align}; //self as gtk,
 
 use gtk_estate::adw::{Application, ApplicationWindow, HeaderBar, WindowTitle, prelude::AdwApplicationWindowExt, gtk::prelude::ApplicationWindowExt, gtk::prelude::GtkWindowExt};
 

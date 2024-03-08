@@ -1,7 +1,7 @@
 use gtk::prelude::ApplicationExt;
-use gtk_estate::gtk4 as gtk;
+use gtk_estate::{gtk4 as gtk, ApplicationAdapter, ApplicationStateContainer, StateContainers, StoredApplicationObject};
 
-use gtk_estate::*;
+//use gtk_estate::*;
 
 //use gtk::Application;
 
@@ -13,32 +13,40 @@ use std::cell::{RefCell, Ref, RefMut};
 
 //use corlib::rc_self_init_refcell_setup_returned_named;
 
-use corlib::{rc_self_rfc_setup, NonOption}; //use corlib::{rc_self_refcell_setup, NonOption}; //rc_self_init_refcell_setup_returned
+use gtk_estate::corlib::{rc_self_rfc_setup, NonOption}; //use corlib::{rc_self_refcell_setup, NonOption}; //rc_self_init_refcell_setup_returned
 
-use crate::window_state::*;
+//use crate::window_state::*;
 
-pub struct ApplicattionState
+use gtk_estate::corlib::{AsAny, impl_as_any};
+
+use gtk_estate::AdwApplcationWindowState;
+
+pub struct ApplicationState
 {
 
     app_ad: ApplicationAdapter<Application>,
     //weak_self: NonOption<Weak<RefCell<Self>>>
-    weak_self: Weak<ApplicattionState>
+    weak_self: Weak<ApplicationState>
 
 }
 
-impl ApplicattionState
+impl ApplicationState
 {
 
-    pub fn new(app: &Application) -> Rc<ApplicattionState>
+    pub fn new(app: &Application) -> Rc<ApplicationState>
     {
 
         let this = Rc::new_cyclic(|weak_self|
         {
 
+            let any_this: &dyn Any = &weak_self;
+
+            let asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>");
+
             Self
             {
 
-                app_ad: ApplicationAdapter::new(&app),
+                app_ad: ApplicationAdapter::new(&app, asc),
                 weak_self: weak_self.clone()
 
             }
@@ -50,7 +58,19 @@ impl ApplicattionState
 
             //new window
 
-            WindowState::new(app);
+            //WindowState::new(app);
+
+            AdwApplcationWindowState::builder(|builder| {
+
+                builder.application(app)
+                .default_width(1000)
+                .default_height(1000)
+                //.title("Rustpad")
+                //.show_menubar(true)
+                //.content(&contents)
+                .build()
+
+            });
 
         });
 
@@ -113,7 +133,11 @@ impl ApplicattionState
 
         //add this application
 
-        scs.set_application_state_or_panic(this);
+        let any_this: &dyn Any = &this;
+
+        let asc = any_this.downcast_ref::<Rc<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>");
+
+        scs.set_application_state_or_panic(asc);
 
         //scs.set_application_state(state) //.adw().borrow_mut_applications().add_refcell(&rc_self);
 
@@ -132,7 +156,9 @@ impl ApplicattionState
 
 }
 
-impl ApplicationStateContainer for ApplicattionState
+impl_as_any!(ApplicationState);
+
+impl ApplicationStateContainer for ApplicationState
 {
 
     fn application(&self) -> &(dyn StoredApplicationObject)

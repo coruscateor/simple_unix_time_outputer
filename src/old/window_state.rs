@@ -104,7 +104,7 @@ impl WindowState
 
 }
 
-impl_has_application_window!(window, WindowState);
+//impl_has_application_window!(window, WindowState);
 
 /*
 impl HasObject<ApplicationWindow> for WindowState
