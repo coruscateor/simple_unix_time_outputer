@@ -1,12 +1,16 @@
 
 use std::cell::RefCell;
+
 use std::rc::{Weak, Rc};
+
 use std::time::Duration;
 
-use gtk_estate::{gtk4 as gtk, StateContainers};
+use gtk_estate::{gtk4 as gtk, StateContainers, WidgetStateContainer};
 
 use gtk_estate::corlib::events::SenderEventFunc;
+
 use gtk_estate::corlib::rc_default::RcDefault;
+
 use gtk_estate::gtk4::prelude::{BoxExt, WidgetExt};
 //use gtk_estate::{HasObject, impl_has_box, impl_has_object, StateContainers}; //get_state_containers, 
 
@@ -14,16 +18,19 @@ use gtk_estate::gtk4::{Box, Orientation, Label, BaselinePosition, Align}; //self
 
 use gtk_estate::adw::{Application, ApplicationWindow, HeaderBar, WindowTitle, prelude::AdwApplicationWindowExt, gtk::prelude::ApplicationWindowExt, gtk::prelude::GtkWindowExt};
 
-use gtk_estate::corlib::{NonOption, rc_self_setup};
+use gtk_estate::corlib::{impl_as_any, rc_self_setup, NonOption, AsAny};
 
 use gtk_estate::time_out::*;
 
 use time::OffsetDateTime;
 
+use std::any::Any;
+
 pub struct WindowContentsState
 {
 
-    weak_self: RefCell<NonOption<Weak<Self>>>,
+    //weak_self: RefCell<NonOption<Weak<Self>>>,
+    weak_self: Weak<Self>,
     cbox: Box,
     window_title: WindowTitle,
     hb: HeaderBar,
@@ -77,24 +84,31 @@ impl WindowContentsState
 
         let time_out = TimeOut::new(Duration::new(1, 0), true); //TimeOut::rc_default(); //new(Duration::new(1, 0));
 
-        let this = Self
+        let this = Rc::new_cyclic( move |weak_self|
         {
 
-            weak_self: NonOption::invalid_rfc(), //invalid_refcell(),
-            cbox,
-            window_title,
-            hb,
-            unix_time_label,
-            internal_content,
-            time_out
+            Self
+            {
 
-        };
+                //weak_self: NonOption::invalid_rfc(), //invalid_refcell(),
+                weak_self: weak_self.clone(),
+                cbox,
+                window_title,
+                hb,
+                unix_time_label,
+                internal_content,
+                time_out
 
-        let rc_self = Rc::new(this);
+            }
+
+        });
+
+
+        //let rc_self = Rc::new(this);
 
         //setup weak self reference
 
-        rc_self_setup!(rc_self, weak_self);
+        //rc_self_setup!(rc_self, weak_self);
 
         //get the state containers singletion
 
@@ -106,9 +120,11 @@ impl WindowContentsState
 
         //scs.get_gtk_ref().get_boxes_mut().add(&rc_self);
 
-        scs.gtk().borrow_mut_boxes().add(&rc_self);//.get_boxes_mut().add(&rc_self);
+        //scs.gtk().borrow_mut_boxes().add(&rc_self);//.get_boxes_mut().add(&rc_self);
 
-        let ws = rc_self.weak_self.borrow().get_ref().clone(); //.as_ref().clone();
+        scs.add(&this); //&rc_self);
+
+        let ws = this.weak_self.clone(); //rc_self.weak_self.borrow().get_ref().clone(); //.as_ref().clone();
 
         let on_timeout: Rc<SenderEventFunc<Rc<TimeOut>>> = Rc::new(move |_sender| {
 
@@ -133,7 +149,9 @@ impl WindowContentsState
 
         });
 
-        rc_self.time_out.on_time_out_subscribe(&on_timeout);
+        //rc_self.time_out.on_time_out_subscribe(&on_timeout);
+
+        this.time_out.on_time_out_subscribe(&on_timeout);
 
         {
 
@@ -151,19 +169,34 @@ impl WindowContentsState
         
         //contents.add_controller(controller)
 
-        app.set_content(Some(&rc_self.cbox));
+        app.set_content(Some(&this.cbox)); //&rc_self.cbox));
 
         //rc_self.time_out.set_reoccurs(true);
 
-        rc_self.time_out.start();
+        //rc_self.time_out.start();
+
+        this.time_out.start();
 
         //done!
 
-        rc_self
+        //rc_self
+
+        this
 
     }
 
 }
 
-impl_has_box!(cbox, WindowContentsState);
+impl_as_any!(WindowContentsState);
+
+impl WidgetStateContainer for WindowContentsState
+{
+    fn widget(&self) -> &(dyn gtk_estate::StoredWidgetObject) {
+        todo!()
+    }
+}
+
+
+
+//impl_has_box!(cbox, WindowContentsState);
 
