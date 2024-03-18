@@ -33,20 +33,40 @@ pub struct ApplicationState
 impl ApplicationState
 {
 
+    //Missing parent
+
     pub fn new(app: &Application) -> Rc<ApplicationState>
     {
 
         let this = Rc::new_cyclic(|weak_self|
         {
 
-            let any_this: &dyn Any = &weak_self;
+            //let asc;
 
-            let asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>");
+            //{
+
+                //let any_this: &dyn Any = weak_self; //.as_any();
+                
+                //weak_self.downcast
+
+                //asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>").clone();
+
+            //}
+
+            //let my_self = weak_self.upgrade(); //.unwrap();
+
+            //let any_this: &dyn Any = weak_self.as_any();
+
+            let any_this: &dyn Any = weak_self; //.as_any();
+                
+            //weak_self.downcast
+
+            let asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Weak<dyn ApplicationStateContainer>");
 
             Self
             {
 
-                app_ad: ApplicationAdapter::new(&app, asc),
+                app_ad: ApplicationAdapter::new(&app, &asc),
                 weak_self: weak_self.clone()
 
             }
@@ -161,7 +181,7 @@ impl_as_any!(ApplicationState);
 impl ApplicationStateContainer for ApplicationState
 {
 
-    fn application(&self) -> &(dyn StoredApplicationObject)
+    fn adapted_application(&self) -> &(dyn StoredApplicationObject)
     {
         
         &self.app_ad

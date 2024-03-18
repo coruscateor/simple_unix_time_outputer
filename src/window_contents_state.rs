@@ -5,7 +5,7 @@ use std::rc::{Weak, Rc};
 
 use std::time::Duration;
 
-use gtk_estate::{gtk4 as gtk, StateContainers, WidgetStateContainer};
+use gtk_estate::{gtk4 as gtk, StateContainers, WidgetAdapter, WidgetStateContainer};
 
 use gtk_estate::corlib::events::SenderEventFunc;
 
@@ -31,12 +31,13 @@ pub struct WindowContentsState
 
     //weak_self: RefCell<NonOption<Weak<Self>>>,
     weak_self: Weak<Self>,
-    cbox: Box,
+    //cbox: Box,
     window_title: WindowTitle,
     hb: HeaderBar,
     unix_time_label: Label,
     internal_content: Box,
-    time_out: RcTimeOut
+    time_out: RcTimeOut,
+    adapted_cbox: WidgetAdapter<Box>
 
 }
 
@@ -87,17 +88,22 @@ impl WindowContentsState
         let this = Rc::new_cyclic( move |weak_self|
         {
 
+            //let any_this: &dyn Any = weak_self;
+
+            //let asc = any_this.downcast_ref::<Weak<dyn WidgetStateContainer>>().expect("Error: No Weak<dyn WidgetStateContainer>");
+
             Self
             {
 
                 //weak_self: NonOption::invalid_rfc(), //invalid_refcell(),
                 weak_self: weak_self.clone(),
-                cbox,
+                //cbox,
                 window_title,
                 hb,
                 unix_time_label,
                 internal_content,
-                time_out
+                time_out,
+                adapted_cbox: WidgetAdapter::new(&cbox, weak_self) //asc)
 
             }
 
@@ -169,7 +175,7 @@ impl WindowContentsState
         
         //contents.add_controller(controller)
 
-        app.set_content(Some(&this.cbox)); //&rc_self.cbox));
+        app.set_content(Some(this.adapted_cbox.widget())); //&this.adapted_cbox.widget() //cbox)); //&rc_self.cbox));
 
         //rc_self.time_out.set_reoccurs(true);
 
@@ -191,9 +197,14 @@ impl_as_any!(WindowContentsState);
 
 impl WidgetStateContainer for WindowContentsState
 {
-    fn widget(&self) -> &(dyn gtk_estate::StoredWidgetObject) {
+
+    fn adapted_widget(&self) -> &(dyn gtk_estate::StoredWidgetObject)
+    {
+
         todo!()
+
     }
+
 }
 
 
