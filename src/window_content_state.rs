@@ -5,7 +5,7 @@ use std::rc::{Weak, Rc};
 
 use std::time::Duration;
 
-use gtk_estate::{gtk4 as gtk, StateContainers, WidgetAdapter, WidgetStateContainer};
+use gtk_estate::{gtk4 as gtk, StateContainers, StoredWidgetObject, WidgetAdapter, WidgetStateContainer};
 
 use gtk_estate::corlib::events::SenderEventFunc;
 
@@ -26,7 +26,7 @@ use time::OffsetDateTime;
 
 use std::any::Any;
 
-pub struct WindowContentsState
+pub struct WindowContentState
 {
 
     //weak_self: RefCell<NonOption<Weak<Self>>>,
@@ -37,14 +37,14 @@ pub struct WindowContentsState
     unix_time_label: Label,
     internal_content: Box,
     time_out: RcTimeOut,
-    adapted_cbox: WidgetAdapter<Box>
+    adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
 
 }
 
-impl WindowContentsState
+impl WindowContentState
 {
 
-    pub fn new(app: &ApplicationWindow) -> Rc<Self>
+    pub fn new() -> Rc<Self> //(app: &ApplicationWindow) -> Rc<Self>
     {
 
         let cbox = Box::new(Orientation::Vertical, 0);
@@ -175,7 +175,7 @@ impl WindowContentsState
         
         //contents.add_controller(controller)
 
-        app.set_content(Some(this.adapted_cbox.widget())); //&this.adapted_cbox.widget() //cbox)); //&rc_self.cbox));
+        //app.set_content(Some(this.adapted_cbox.widget())); //&this.adapted_cbox.widget() //cbox)); //&rc_self.cbox));
 
         //rc_self.time_out.set_reoccurs(true);
 
@@ -193,15 +193,15 @@ impl WindowContentsState
 
 }
 
-impl_as_any!(WindowContentsState);
+impl_as_any!(WindowContentState);
 
-impl WidgetStateContainer for WindowContentsState
+impl WidgetStateContainer for WindowContentState
 {
 
-    fn adapted_widget(&self) -> &(dyn gtk_estate::StoredWidgetObject)
+    fn dyn_adapter(&self) -> Rc<dyn StoredWidgetObject> //&(dyn gtk_estate::StoredWidgetObject)
     {
 
-        todo!()
+        self.adapted_cbox.clone()
 
     }
 

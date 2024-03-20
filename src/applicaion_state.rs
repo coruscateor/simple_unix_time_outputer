@@ -21,12 +21,14 @@ use gtk_estate::corlib::{AsAny, impl_as_any};
 
 use gtk_estate::AdwApplcationWindowState;
 
+use crate::window_content_state::WindowContentState;
+
 pub struct ApplicationState
 {
 
-    app_ad: ApplicationAdapter<Application>,
+    app_ad: Rc<ApplicationAdapter<Application, ApplicationState>>,
     //weak_self: NonOption<Weak<RefCell<Self>>>
-    weak_self: Weak<ApplicationState>
+    //weak_self: Weak<ApplicationState>
 
 }
 
@@ -57,17 +59,21 @@ impl ApplicationState
 
             //let any_this: &dyn Any = weak_self.as_any();
 
-            let any_this: &dyn Any = weak_self; //.as_any();
+            //let any_this: &dyn Any = weak_self; //.as_any();
                 
             //weak_self.downcast
 
-            let asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Weak<dyn ApplicationStateContainer>");
+            //let asc = any_this.downcast_ref::<Weak<dyn ApplicationStateContainer>>().expect("Error: No Weak<dyn ApplicationStateContainer>");
+            
+            //let ws: &Weak<dyn ApplicationStateContainer> = weak_self;
+
+            //let wsc = ws.clone();
 
             Self
             {
 
-                app_ad: ApplicationAdapter::new(&app, &asc),
-                weak_self: weak_self.clone()
+                app_ad: ApplicationAdapter::new(app, weak_self), //wsc), //&asc),
+                //weak_self: weak_self.clone()
 
             }
 
@@ -80,17 +86,16 @@ impl ApplicationState
 
             //WindowState::new(app);
 
-            AdwApplcationWindowState::builder(|builder| {
+            let content = WindowContentState::new();
+
+            AdwApplcationWindowState::builder_with_content_visible(|builder| {
 
                 builder.application(app)
                 .default_width(1000)
                 .default_height(1000)
-                //.title("Rustpad")
-                //.show_menubar(true)
-                //.content(&contents)
                 .build()
 
-            });
+            }, &content);
 
         });
 
@@ -149,15 +154,39 @@ impl ApplicationState
 
         //
 
+        //this.app_ad.application().connect_activate(move |app|
+        //{
+
+            //create the content
+
+            //let content = WindowContentState::new(); //(app);
+
+            //new window
+
+            /*
+            AdwApplcationWindowState::builder_with_content(|builder| {
+
+                builder.application(app)
+                .default_width(1000)
+                .default_height(1000)
+                .build()
+
+            }, &content);
+
+        });
+        */
+
         let scs = StateContainers::get();
 
         //add this application
 
-        let any_this: &dyn Any = &this;
+        //let any_this: &dyn Any = &this;
 
-        let asc = any_this.downcast_ref::<Rc<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>");
+        //let asc = any_this.downcast_ref::<Rc<dyn ApplicationStateContainer>>().expect("Error: No Rc<dyn ApplicationStateContainer>");
 
-        scs.set_application_state_or_panic(asc);
+        //Set the application state
+
+        scs.set_application_state_or_panic(&this); //asc);
 
         //scs.set_application_state(state) //.adw().borrow_mut_applications().add_refcell(&rc_self);
 
@@ -167,7 +196,7 @@ impl ApplicationState
 
     //get weak self
 
-    fn adapter(&self) -> &ApplicationAdapter<Application>
+    fn adapter(&self) -> &ApplicationAdapter<Application, ApplicationState>
     {
         
         &self.app_ad
@@ -181,10 +210,16 @@ impl_as_any!(ApplicationState);
 impl ApplicationStateContainer for ApplicationState
 {
 
-    fn adapted_application(&self) -> &(dyn StoredApplicationObject)
+    fn dyn_adapter(&self) -> Rc<dyn StoredApplicationObject> //&(dyn StoredApplicationObject)
     {
-        
-        &self.app_ad
+
+        //&self.app_ad
+
+        //let any_app_ad = &self.app_ad as &dyn Any;
+
+        //any_app_ad.downcast_ref::<(dyn StoredApplicationObject)>().expect("Error: ApplicationStateContainer: this doesn't work")
+
+        self.app_ad.clone()
 
     }
 
