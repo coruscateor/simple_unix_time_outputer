@@ -71,8 +71,8 @@ impl WindowContentState
 
         //Label
 
-        let unix_time_label = Label::new(Some("unix_time_label"));
-
+        let unix_time_label = Label::new(Some("")); //"unix_time_label"));
+        
         internal_content.append(&unix_time_label);
 
         internal_content.set_vexpand(true);
