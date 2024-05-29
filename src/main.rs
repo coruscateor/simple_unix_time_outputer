@@ -19,9 +19,9 @@ fn main() {
     //let _sc = StateContainers::new();
 
 
-    //Initalise the StateContainers,you must do this for the application to work.
+    //Don't initalise the StateContainers,you must do this for the application to work.
 
-    StateContainers::init();    
+    //StateContainers::init();    
 
     //let teas = 
 

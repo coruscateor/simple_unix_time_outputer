@@ -5,6 +5,7 @@ use std::rc::{Weak, Rc};
 
 use std::time::Duration;
 
+use gtk_estate::adw::glib::clone::Upgrade;
 use gtk_estate::{gtk4 as gtk, StateContainers, StoredWidgetObject, WidgetAdapter, WidgetStateContainer};
 
 use gtk_estate::corlib::events::SenderEventFunc;
@@ -36,7 +37,7 @@ pub struct WindowContentState
     hb: HeaderBar,
     unix_time_label: Label,
     internal_content: Box,
-    time_out: RcTimeOut,
+    time_out: RcTimeOut<Weak<WindowContentState>>,
     adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
 
 }
@@ -83,7 +84,7 @@ impl WindowContentState
 
         cbox.append(&internal_content);
 
-        let time_out = TimeOut::new(Duration::new(1, 0), true); //TimeOut::rc_default(); //new(Duration::new(1, 0));
+        //let time_out = TimeOut::new(Duration::new(1, 0), true); //TimeOut::rc_default(); //new(Duration::new(1, 0));
 
         let this = Rc::new_cyclic( move |weak_self|
         {
@@ -102,7 +103,8 @@ impl WindowContentState
                 hb,
                 unix_time_label,
                 internal_content,
-                time_out,
+                //time_out,
+                time_out: TimeOut::with_state_ref(Duration::new(1, 0), true, weak_self),
                 adapted_cbox: WidgetAdapter::new(&cbox, weak_self) //asc)
 
             }
@@ -130,11 +132,11 @@ impl WindowContentState
 
         scs.add(&this); //&rc_self);
 
-        let ws = this.weak_self.clone(); //rc_self.weak_self.borrow().get_ref().clone(); //.as_ref().clone();
+        //let ws = this.weak_self.clone(); //rc_self.weak_self.borrow().get_ref().clone(); //.as_ref().clone();
 
-        let on_timeout: Rc<SenderEventFunc<Rc<TimeOut>>> = Rc::new(move |_sender| {
+        let on_timeout: Rc<SenderEventFunc<RcTimeOut<Weak<WindowContentState>>>> = Rc::new(move |sender| {
 
-            if let Some(this) = ws.upgrade()
+            if let Some(this) = sender.state().upgrade() //ws.upgrade()
             {
 
                 let utc_now = OffsetDateTime::now_utc();
@@ -154,7 +156,7 @@ impl WindowContentState
             true
 
         });
-
+        
         //rc_self.time_out.on_time_out_subscribe(&on_timeout);
 
         this.time_out.on_time_out_subscribe(&on_timeout);
