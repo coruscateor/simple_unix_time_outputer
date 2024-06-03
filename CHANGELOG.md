@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.3.0 (03/06/2024)
+
+- Cleaned up the project.
+- Removed old code files.
+- Updated the gtk_estate dependency to version 0.3.0.
+- Updated the readme.
+
 ## Version 0.2.0 (22/04/2024)
 
 - Upgraded the application to use GTK Estate version 0.2.0.

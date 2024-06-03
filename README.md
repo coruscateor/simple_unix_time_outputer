@@ -8,10 +8,6 @@ A GTK Estate example application that displays the current Unix timestamp at the
 
 </br>
 
-I should clean up the code sometime.
-
-</br>
-
 ## Build Instructions
 
 See [GTK Estate](https://crates.io/crates/gtk_estate)
@@ -20,7 +16,7 @@ See [GTK Estate](https://crates.io/crates/gtk_estate)
 
 ## Coding Style
 
-This project uses a coding style the emphasises the use of white space over keeping the line and column counts as low as possible.
+This project uses a coding style that emphasises the use of white space over keeping the line and column counts as low as possible.
 
 So this:
 
