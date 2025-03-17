@@ -1,16 +1,16 @@
 [package]
 name = "simple_unix_time_outputer"
-version = "0.3.0"
+version = "0.4.0-alpha"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#gtk_estate = { path="../gtk_estate", features = ["adw"] } #["adw_v1_5"] } #Do not remove
-gtk_estate = { version = "0.3.0", features = ["adw"] }
+gtk_estate = { path="../gtk_estate", features = ["adw"] } #["adw_v1_5"] } #Do not remove
+#gtk_estate = { version = "0.3.0", features = ["adw"] }
 
 #corlib = { path="../corlib" } #Do not remove
 
-time = { version = "0.3.*", features = ["std"] }
+time = { version = "0.3.39", features = ["std"] }
 

@@ -7,26 +7,33 @@ use std::time::Duration;
 
 use gtk_estate::adw::glib::clone::Upgrade;
 
-use gtk_estate::{gtk4 as gtk, scs_add, StateContainers, StoredWidgetObject, WidgetAdapter, WidgetStateContainer};
+use gtk_estate::{/*gtk4 as gtk,*/ impl_widget_state_container_traits, scs_add, StateContainers, WidgetAdapter, WidgetStateContainer};
 
 use gtk_estate::corlib::events::SenderEventFunc;
 
-use gtk_estate::corlib::rc_default::RcDefault;
+//use gtk_estate::corlib::rc_default::RcDefault;
 
-use gtk_estate::gtk4::prelude::{BoxExt, WidgetExt};
+use gtk_estate::gtk::prelude::{BoxExt, WidgetExt};
 
-use gtk_estate::gtk4::{Box, Orientation, Label, BaselinePosition, Align};
+use gtk_estate::gtk::{Box, Orientation, Label, BaselinePosition, Align};
 
 use gtk_estate::adw::{Application, ApplicationWindow, HeaderBar, WindowTitle, prelude::AdwApplicationWindowExt, gtk::prelude::ApplicationWindowExt, gtk::prelude::GtkWindowExt};
 
-use gtk_estate::corlib::{impl_as_any, AsAny};
+use gtk_estate::corlib::convert::AsAnyRef;
 
-use gtk_estate::{RcTimeOut, TimeOut};
+use gtk_estate::corlib::impl_as_any_ref;
+
+use gtk_estate::{TimeOut, TimeOutRunType};
 
 use time::OffsetDateTime;
 
 use std::any::Any;
 
+use gtk_estate::{DynWidgetStateContainer, WidgetObject};
+
+use gtk_estate::corlib::WeakSelf;
+
+#[derive(Debug)]
 pub struct WindowContentState
 {
 
@@ -35,18 +42,19 @@ pub struct WindowContentState
     hb: HeaderBar,
     unix_time_label: Label,
     internal_content: Box,
-    time_out: RcTimeOut<Weak<WindowContentState>>,
-    adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
+    time_out: TimeOut<WindowContentState>, //Weak<WindowContentState>>,
+    //adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
+    adapted_window: Rc<WidgetAdapter<ApplicationWindow, Self>>,
 
 }
 
 impl WindowContentState
 {
 
-    pub fn new() -> Rc<Self>
+    pub fn new(application: &Application) -> Rc<Self>
     {
 
-        let cbox = gtk::Box::new(Orientation::Vertical, 0);
+        let cbox = Box::new(Orientation::Vertical, 0);
 
         cbox.set_vexpand(true);
 
@@ -62,7 +70,7 @@ impl WindowContentState
 
         //Internal Content
 
-        let internal_content = gtk::Box::new(Orientation::Vertical, 0);
+        let internal_content = Box::new(Orientation::Vertical, 0);
 
         //Label
 
@@ -75,6 +83,21 @@ impl WindowContentState
         internal_content.set_valign(Align::Center);
 
         cbox.append(&internal_content);
+
+        //ApplicationWindow
+
+        let builder = ApplicationWindow::builder();
+
+        let window = builder.application(application)
+            .default_width(1000)
+            .default_height(1000)
+
+            //Make sure to set the content of the ApplicationWindow.
+
+            .content(&cbox)
+            .visible(true)
+            //.hide_on_close(false)
+            .build();
 
         //Initialise WindowContentState
 
@@ -89,8 +112,9 @@ impl WindowContentState
                 hb,
                 unix_time_label,
                 internal_content,
-                time_out: TimeOut::with_state_ref(Duration::new(1, 0), true, weak_self),
-                adapted_cbox: WidgetAdapter::new(&cbox, weak_self)
+                time_out: TimeOut::new(TimeOutRunType::Seconds(1), weak_self),
+                adapted_window: WidgetAdapter::new(&window, weak_self)
+
             }
 
         });
@@ -99,9 +123,9 @@ impl WindowContentState
 
         scs_add!(this);
 
-        let on_timeout: Rc<SenderEventFunc<RcTimeOut<Weak<WindowContentState>>>> = Rc::new(move |sender| {
+        let on_timeout: Rc<SenderEventFunc<TimeOut<Weak<WindowContentState>>>> = Rc::new(move |sender| {
 
-            if let Some(this) = sender.state().upgrade()
+            if let Some(this) = sender.par().upgrade()
             {
 
                 let utc_now = OffsetDateTime::now_utc();
@@ -134,6 +158,9 @@ impl WindowContentState
 
 }
 
+impl_widget_state_container_traits!(ApplicationWindow, WindowContentState);
+
+/*
 impl_as_any!(WindowContentState);
 
 impl WidgetStateContainer for WindowContentState
@@ -147,3 +174,4 @@ impl WidgetStateContainer for WindowContentState
     }
 
 }
+*/
