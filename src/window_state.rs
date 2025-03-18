@@ -22,16 +22,16 @@ use gtk_estate::{DynWidgetStateContainer, WidgetObject};
 use gtk_estate::corlib::WeakSelf;
 
 #[derive(Debug)]
-pub struct WindowContentState
+pub struct WindowState
 {
 
     unix_time_label: Label,
-    time_out: TimeOut<WindowContentState>,
+    time_out: TimeOut<WindowState>,
     widget_adapter: Rc<WidgetAdapter<ApplicationWindow, Self>>,
 
 }
 
-impl WindowContentState
+impl WindowState
 {
 
     pub fn new(application: &Application) -> Rc<Self>
@@ -81,7 +81,7 @@ impl WindowContentState
             .visible(true)
             .build();
 
-        //Initialise WindowContentState
+        //Initialise WindowState
 
         let this = Rc::new_cyclic( move |weak_self|
         {
@@ -97,7 +97,7 @@ impl WindowContentState
 
         });
 
-        //Add WindowContentState to the StateContainers object.
+        //Add WindowState to the StateContainers object.
 
         scs_add!(this);
 
@@ -128,4 +128,4 @@ impl WindowContentState
 
 }
 
-impl_widget_state_container_traits!(ApplicationWindow, WindowContentState);
+impl_widget_state_container_traits!(ApplicationWindow, WindowState);

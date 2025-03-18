@@ -10,7 +10,7 @@ use std::rc::{Rc, Weak};
 
 use gtk_estate::StateContainers;
 
-use crate::window_content_state::WindowContentState;
+use crate::window_state::WindowState;
 
 use gtk_estate::corlib::WeakSelf;
 
@@ -46,7 +46,7 @@ impl ApplicationState
 
             //new window
 
-            WindowContentState::new(app);
+            WindowState::new(app);
             
         });
 

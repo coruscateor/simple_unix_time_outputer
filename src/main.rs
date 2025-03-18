@@ -4,7 +4,7 @@ use gtk_estate::adw::{prelude::*, Application};
 
 use crate::applicaion_state::ApplicationState;
 
-mod window_content_state;
+mod window_state;
 
 fn main()
 {
