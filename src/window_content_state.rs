@@ -1,27 +1,15 @@
 
-use std::cell::RefCell;
-
 use std::rc::{Weak, Rc};
 
-use std::time::Duration;
-
-use gtk_estate::adw::glib::clone::Upgrade;
-
-use gtk_estate::{/*gtk4 as gtk,*/ impl_widget_state_container_traits, scs_add, StateContainers, WidgetAdapter, WidgetStateContainer};
-
-use gtk_estate::corlib::events::SenderEventFunc;
-
-//use gtk_estate::corlib::rc_default::RcDefault;
+use gtk_estate::{impl_widget_state_container_traits, scs_add, StateContainers, WidgetAdapter, WidgetStateContainer};
 
 use gtk_estate::gtk::prelude::{BoxExt, WidgetExt};
 
-use gtk_estate::gtk::{Box, Orientation, Label, BaselinePosition, Align};
+use gtk_estate::gtk::{Box, Orientation, Label, Align};
 
-use gtk_estate::adw::{Application, ApplicationWindow, HeaderBar, WindowTitle, prelude::AdwApplicationWindowExt, gtk::prelude::ApplicationWindowExt, gtk::prelude::GtkWindowExt};
+use gtk_estate::adw::{Application, ApplicationWindow, HeaderBar, WindowTitle};
 
 use gtk_estate::corlib::convert::AsAnyRef;
-
-use gtk_estate::corlib::impl_as_any_ref;
 
 use gtk_estate::{TimeOut, TimeOutRunType};
 
@@ -37,14 +25,8 @@ use gtk_estate::corlib::WeakSelf;
 pub struct WindowContentState
 {
 
-    //weak_self: Weak<Self>,
-    //window_title: WindowTitle,
-    //hb: HeaderBar,
     unix_time_label: Label,
-    //internal_content: Box,
-    time_out: TimeOut<WindowContentState>, //Weak<WindowContentState>>,
-    //adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
-    //adapted_window: Rc<WidgetAdapter<ApplicationWindow, Self>>,
+    time_out: TimeOut<WindowContentState>,
     widget_adapter: Rc<WidgetAdapter<ApplicationWindow, Self>>,
 
 }
@@ -97,7 +79,6 @@ impl WindowContentState
 
             .content(&cbox)
             .visible(true)
-            //.hide_on_close(false)
             .build();
 
         //Initialise WindowContentState
@@ -108,13 +89,8 @@ impl WindowContentState
             Self
             {
 
-                //weak_self: weak_self.clone(),
-                //window_title,
-                //hb,
                 unix_time_label,
-                //internal_content,
                 time_out: TimeOut::new(TimeOutRunType::Seconds(1), weak_self),
-                //adapted_window: WidgetAdapter::new(&window, weak_self)
                 widget_adapter: WidgetAdapter::new(&window, weak_self)
 
             }
@@ -125,7 +101,8 @@ impl WindowContentState
 
         scs_add!(this);
 
-        let on_timeout = Rc::new(move |this: Rc<Self>| { //: Rc<SenderEventFunc<TimeOut<Weak<WindowContentState>>>>
+        let on_timeout = Rc::new(move |this: Rc<Self>|
+        {
 
             let utc_now = OffsetDateTime::now_utc();
 
@@ -141,8 +118,6 @@ impl WindowContentState
 
         this.time_out.start();
 
-        //Done!
-
         this
 
     }
@@ -150,19 +125,3 @@ impl WindowContentState
 }
 
 impl_widget_state_container_traits!(ApplicationWindow, WindowContentState);
-
-/*
-impl_as_any!(WindowContentState);
-
-impl WidgetStateContainer for WindowContentState
-{
-
-    fn dyn_adapter(&self) -> Rc<dyn StoredWidgetObject>
-    {
-
-        self.adapted_cbox.clone()
-
-    }
-
-}
-*/

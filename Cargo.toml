@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gtk_estate = { path="../gtk_estate", features = ["adw"] } #["adw_v1_5"] } #Do not remove
+gtk_estate = { path="../gtk_estate", features = ["adw"] } #Do not remove
 #gtk_estate = { version = "0.3.0", features = ["adw"] }
 
 #corlib = { path="../corlib" } #Do not remove

@@ -1,18 +1,15 @@
 mod applicaion_state;
 
-use gtk_estate::{adw::{prelude::*, Application}, StateContainers};
+use gtk_estate::adw::{prelude::*, Application};
 
 use crate::applicaion_state::ApplicationState;
 
 mod window_content_state;
 
-fn main() {
+fn main()
+{
 
-    let app = Application::builder().application_id("org.unit_time_gui").build();
-
-    //Explicit initialisation of the StateContainers object is no longer required as of v0.3.0.
-
-    //StateContainers::init();    
+    let app = Application::builder().application_id("org.unit_time_gui").build();  
 
     //Setup the application state.
     
