@@ -37,11 +37,11 @@ impl WindowContentState
     pub fn new(application: &Application) -> Rc<Self>
     {
 
+        //Initialise The window content box.
+
         let cbox = Box::new(Orientation::Vertical, 0);
 
         cbox.set_vexpand(true);
-
-        //Add Contents
         
         //HeaderBar
 
@@ -55,7 +55,7 @@ impl WindowContentState
 
         let internal_content = Box::new(Orientation::Vertical, 0);
 
-        //Label
+        //The Unix time display Label.
 
         let unix_time_label = Label::new(Some(""));
         
@@ -67,7 +67,7 @@ impl WindowContentState
 
         cbox.append(&internal_content);
 
-        //ApplicationWindow
+        //Initialise ApplicationWindow
 
         let builder = ApplicationWindow::builder();
 
@@ -75,7 +75,7 @@ impl WindowContentState
             .default_width(1000)
             .default_height(1000)
 
-            //Make sure to set the content of the ApplicationWindow.
+            //Set the content of the ApplicationWindow.
 
             .content(&cbox)
             .visible(true)
@@ -101,6 +101,8 @@ impl WindowContentState
 
         scs_add!(this);
 
+        //Setup the on_timeout closure.
+
         let on_timeout = Rc::new(move |this: Rc<Self>|
         {
 
@@ -113,6 +115,8 @@ impl WindowContentState
             true
 
         });
+
+        //Set the closure and start the TimeOut.
 
         this.time_out.set_time_out_fn(&on_timeout);
 
