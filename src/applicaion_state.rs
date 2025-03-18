@@ -59,7 +59,10 @@ impl ApplicationState
 
             //new window
 
-            let content = WindowContentState::new();
+            WindowContentState::new(app);
+
+            /*
+            let content = WindowContentState::new(app);
 
             AdwApplcationWindowState::builder_with_content_visible(|builder| {
 
@@ -69,6 +72,7 @@ impl ApplicationState
                 .build()
 
             }, &content);
+            */
 
         });
 

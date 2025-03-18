@@ -37,14 +37,15 @@ use gtk_estate::corlib::WeakSelf;
 pub struct WindowContentState
 {
 
-    weak_self: Weak<Self>,
-    window_title: WindowTitle,
-    hb: HeaderBar,
+    //weak_self: Weak<Self>,
+    //window_title: WindowTitle,
+    //hb: HeaderBar,
     unix_time_label: Label,
-    internal_content: Box,
+    //internal_content: Box,
     time_out: TimeOut<WindowContentState>, //Weak<WindowContentState>>,
     //adapted_cbox: Rc<WidgetAdapter<Box, WindowContentState>>
-    adapted_window: Rc<WidgetAdapter<ApplicationWindow, Self>>,
+    //adapted_window: Rc<WidgetAdapter<ApplicationWindow, Self>>,
+    widget_adapter: Rc<WidgetAdapter<ApplicationWindow, Self>>,
 
 }
 
@@ -107,13 +108,14 @@ impl WindowContentState
             Self
             {
 
-                weak_self: weak_self.clone(),
-                window_title,
-                hb,
+                //weak_self: weak_self.clone(),
+                //window_title,
+                //hb,
                 unix_time_label,
-                internal_content,
+                //internal_content,
                 time_out: TimeOut::new(TimeOutRunType::Seconds(1), weak_self),
-                adapted_window: WidgetAdapter::new(&window, weak_self)
+                //adapted_window: WidgetAdapter::new(&window, weak_self)
+                widget_adapter: WidgetAdapter::new(&window, weak_self)
 
             }
 
@@ -123,30 +125,19 @@ impl WindowContentState
 
         scs_add!(this);
 
-        let on_timeout: Rc<SenderEventFunc<TimeOut<Weak<WindowContentState>>>> = Rc::new(move |sender| {
+        let on_timeout = Rc::new(move |this: Rc<Self>| { //: Rc<SenderEventFunc<TimeOut<Weak<WindowContentState>>>>
 
-            if let Some(this) = sender.par().upgrade()
-            {
+            let utc_now = OffsetDateTime::now_utc();
 
-                let utc_now = OffsetDateTime::now_utc();
+            let uts = utc_now.unix_timestamp();
 
-                let uts = utc_now.unix_timestamp();
-
-                this.unix_time_label.set_label(&uts.to_string());
-
-            }
-            else
-            {
-
-                return false;
-
-            }
+            this.unix_time_label.set_label(&uts.to_string());
 
             true
 
         });
 
-        this.time_out.on_time_out_subscribe(&on_timeout);
+        this.time_out.set_time_out_fn(&on_timeout);
 
         this.time_out.start();
 
